@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./database/config');
 const authRoute = require('./routes/authRoute');
 const productRoutes = require('./routes/productRoute');
+const cartRoute = require('./routes/cartRoute');
 const errorHandler = require('./middlewares/errorHandler');
 
 dotenv.config();
@@ -16,6 +17,8 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoute);
 app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoute);
+
 
 // Error handler
 app.use(errorHandler);
