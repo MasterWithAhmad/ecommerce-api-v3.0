@@ -1,5 +1,40 @@
 const Product = require('../models/Product');
 
+// Search products by name, category, price range, etc.
+const searchProducts = async (req, res) => {
+  try {
+    const { name, category, minPrice, maxPrice } = req.query;
+
+    // Build search query
+    let query = {};
+
+    if (name) {
+      query.name = { $regex: name, $options: 'i' }; // Case-insensitive search
+    }
+
+    if (category) {
+      query.category = { $regex: category, $options: 'i' };
+    }
+
+    if (minPrice || maxPrice) {
+      query.price = {}; // Initialize price filter object
+      if (minPrice) query.price.$gte = minPrice; // Greater than or equal to minPrice
+      if (maxPrice) query.price.$lte = maxPrice; // Less than or equal to maxPrice
+    }
+
+    const products = await Product.find(query);
+
+    // Return the filtered products
+    return res.status(200).json({
+      success: true,
+      data: products,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Server Error' });
+  }
+};
+
 // Get all products
 const getProducts = async (req, res) => {
   try {
@@ -96,4 +131,5 @@ module.exports = {
   addProduct,
   updateProduct,
   deleteProduct,
+  searchProducts,
 };
