@@ -8,6 +8,8 @@ const {
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
 const validateRequest = require('../middlewares/validateRequest');
 const Joi = require('joi');
+const { userRateLimiter, adminRateLimiter } = require('../middlewares/rateLimiter'); // Import rate limiter
+
 
 const router = express.Router();
 
@@ -19,13 +21,14 @@ const orderStatusSchema = Joi.object({
 });
 
 // Routes
-router.post('/', authenticate, createOrder); // Place order (Authenticated user)
-router.get('/', authenticate, authorize(['admin']), getAllOrders); // Get all orders (Admin only)
-router.get('/user', authenticate, getUserOrders); // Get user orders (Authenticated user)
+router.post('/', authenticate,userRateLimiter, createOrder); // Place order (Authenticated user)
+router.get('/', authenticate, authorize(['admin']), adminRateLimiter, getAllOrders); // Get all orders (Admin only)
+router.get('/user', authenticate,userRateLimiter, getUserOrders); // Get user orders (Authenticated user)
 router.put(
   '/:orderId',
   authenticate,
   authorize(['admin']),  // Only admin can update status
+  adminRateLimiter,
   validateRequest(orderStatusSchema), // Validate request data
   updateOrderStatus
 ); // Update order status (Admin only)

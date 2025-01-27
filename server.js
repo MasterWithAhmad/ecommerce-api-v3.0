@@ -10,6 +10,8 @@ const errorHandler = require('./middlewares/errorHandler');
 dotenv.config();
 
 const app = express();
+const { userRateLimiter } = require('./middlewares/rateLimiter');
+
 app.use(express.json());
 
 // Database connection
@@ -20,6 +22,9 @@ app.use('/api/auth', authRoute);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoute);
 app.use('/api/orders', orderRoute);
+
+// Apply rate limiter globally(Optional)
+//app.use(userRateLimiter);
 
 
 // Error handler
